@@ -426,17 +426,13 @@
 
 <!-- GRID -->
 <div class="products-grid" id="products-grid">
-  <!-- skeleton -->
-  ${Array(6).fill(`
-    <div class="skeleton">
-      <div class="skeleton-img"></div>
-      <div class="skeleton-body">
-        <div class="skel" style="height:12px;width:60%"></div>
-        <div class="skel" style="height:18px;width:80%"></div>
-        <div class="skel" style="height:12px;width:100%"></div>
-      </div>
-    </div>
-  `).join('')}
+  
+  <div class="skeleton"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skel" style="height:12px;width:60%"></div><div class="skel" style="height:18px;width:80%"></div><div class="skel" style="height:12px;width:100%"></div></div></div>
+  <div class="skeleton"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skel" style="height:12px;width:60%"></div><div class="skel" style="height:18px;width:80%"></div><div class="skel" style="height:12px;width:100%"></div></div></div>
+  <div class="skeleton"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skel" style="height:12px;width:60%"></div><div class="skel" style="height:18px;width:80%"></div><div class="skel" style="height:12px;width:100%"></div></div></div>
+  <div class="skeleton"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skel" style="height:12px;width:60%"></div><div class="skel" style="height:18px;width:80%"></div><div class="skel" style="height:12px;width:100%"></div></div></div>
+  <div class="skeleton"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skel" style="height:12px;width:60%"></div><div class="skel" style="height:18px;width:80%"></div><div class="skel" style="height:12px;width:100%"></div></div></div>
+  <div class="skeleton"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skel" style="height:12px;width:60%"></div><div class="skel" style="height:18px;width:80%"></div><div class="skel" style="height:12px;width:100%"></div></div></div>}
 </div>
 
 <!-- MODAL DETAIL -->
@@ -517,29 +513,4 @@
   }
 
   function copyCode(code) {
-    navigator.clipboard.writeText(code).then(() => showToast('Kode ' + code + ' disalin!', 'success'));
-    document.getElementById('promo-input').value = code;
-  }
-
-  // ── RENDER PRODUCTS ──
-  function renderProducts(products) {
-    const grid = document.getElementById('products-grid');
-    if (!products.length) {
-      grid.innerHTML = `<div class="empty-state"><div class="icon">😔</div><p>Tidak ada produk ditemukan.</p></div>`;
-      return;
-    }
-    grid.innerHTML = products.map(p => {
-      const inStock = p.stock > 0;
-      const isHot = p.stock < 3 && inStock;
-      const imgHTML = p.image_url
-        ? `<img src="${p.image_url}" alt="${p.name}" loading="lazy" />`
-        : '🎮';
-      return `
-        <div class="product-card" onclick="openModal(${p.id})">
-          ${p.discount_percent ? `<div class="card-ribbon">-${p.discount_percent}%</div>` : ''}
-          <div class="card-img">${imgHTML}</div>
-          <div class="card-body">
-            <div class="card-badges">
-              <span class="badge ${inStock ? 'badge-stock' : 'badge-empty'}">${inStock ? `Stok ${p.stock}` : 'Habis'}</span>
-              ${isHot ? '<span class="badge badge-hot">🔥 Hampir Habis</span>' : ''}
-              ${p.is_new ? '<span class="badge badge-new">✨ Baru</span>' : '
+    navigator.clipboard.writeText(code).then(() => showToast('Kode ' + code + ' disalin!', 
