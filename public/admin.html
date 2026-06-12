@@ -180,7 +180,7 @@
       <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
     </div>
     <div class="err-msg" id="login-err"></div>
-    <button class="btn btn-primary btn-full" style="margin-top:12px" onclick="doLogin()">Masuk</button>
+    <button class="btn btn-primary btn-full" style="margin-top:12px;position:relative;z-index:99" onclick="doLogin()">Masuk</button>
   </div>
 </div>
 
@@ -434,4 +434,4 @@
       products = data;
       document.getElementById('dash-total').textContent = data.length;
       document.getElementById('dash-avail').textContent = data.filter(p => p.stock > 0).length;
-      document.getElementById('dash-empty'
+      documen
