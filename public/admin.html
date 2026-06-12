@@ -180,7 +180,7 @@
       <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
     </div>
     <div class="err-msg" id="login-err"></div>
-    <button class="btn btn-primary btn-full" style="margin-top:12px;position:relative;z-index:99" onclick="doLogin()">Masuk</button>
+    <button class="btn btn-primary btn-full" style="margin-top:12px" onclick="doLogin()">Masuk</button>
   </div>
 </div>
 
@@ -375,9 +375,8 @@
     const p = document.getElementById('login-pass').value;
     const err = document.getElementById('login-err');
     if (!u || !p) { err.textContent = 'Isi username dan password.'; return; }
-    err.textContent = 'Memproses...';
     try {
-      const res = await fetch('/api/admin/login', {
+      const res = await fetch(`${API}/api/admin/login`, {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ username: u, password: p })
       });
@@ -388,10 +387,10 @@
         document.getElementById('admin-name').textContent = u;
         showApp();
       } else {
-        err.textContent = data.message || 'Login gagal: ' + JSON.stringify(data);
+        err.textContent = data.message || 'Login gagal.';
       }
     } catch(e) {
-      err.textContent = 'Error: ' + e.message;
+      err.textContent = 'Tidak bisa terhubung ke server.';
     }
   }
 
@@ -434,4 +433,4 @@
       products = data;
       document.getElementById('dash-total').textContent = data.length;
       document.getElementById('dash-avail').textContent = data.filter(p => p.stock > 0).length;
-      documen
+      document.getElementById('dash-empty').textContent = data.filter(p => p.stock <= 
