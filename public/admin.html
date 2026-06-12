@@ -375,8 +375,9 @@
     const p = document.getElementById('login-pass').value;
     const err = document.getElementById('login-err');
     if (!u || !p) { err.textContent = 'Isi username dan password.'; return; }
+    err.textContent = 'Memproses...';
     try {
-      const res = await fetch(`${API}/api/admin/login`, {
+      const res = await fetch('/api/admin/login', {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ username: u, password: p })
       });
@@ -387,10 +388,10 @@
         document.getElementById('admin-name').textContent = u;
         showApp();
       } else {
-        err.textContent = data.message || 'Login gagal.';
+        err.textContent = data.message || 'Login gagal: ' + JSON.stringify(data);
       }
     } catch(e) {
-      err.textContent = 'Tidak bisa terhubung ke server.';
+      err.textContent = 'Error: ' + e.message;
     }
   }
 
@@ -433,4 +434,4 @@
       products = data;
       document.getElementById('dash-total').textContent = data.length;
       document.getElementById('dash-avail').textContent = data.filter(p => p.stock > 0).length;
-      document.getElementById('dash-empty').textContent = data.filter(p => p.stock <= 
+      document.getElementById('dash-empty'
