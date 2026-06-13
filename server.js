@@ -139,4 +139,3 @@ app.delete('/api/promos/:id', authMiddleware, async (req, res) => {
 // ── START ──
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server jalan di port ${PORT}`));
-
