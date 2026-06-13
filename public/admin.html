@@ -1,436 +1,221 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin — RobloxStore</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg:#07111f; --surface:#0d1f35; --card:#112540; --border:#1a3a5c;
-      --accent:#2d9cff; --accent2:#5bb8ff; --text:#e8f4ff; --muted:#7aaac7;
-      --success:#22d3a5; --warn:#f59e0b; --danger:#f43f5e;
-    }
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
-
-    /* ── LOGIN ── */
-    #login-screen {
-      min-height:100vh; display:flex; align-items:center; justify-content:center;
-      padding:16px;
-    }
-    .login-box {
-      background:var(--card); border:1px solid var(--border);
-      border-radius:18px; padding:36px; width:100%; max-width:380px;
-    }
-    .login-logo { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; color:var(--accent); margin-bottom:24px; }
-    .login-box h2 { font-family:'Syne',sans-serif; font-size:1.1rem; margin-bottom:24px; }
-    .form-group { margin-bottom:16px; }
-    .form-group label { display:block; font-size:0.8rem; color:var(--muted); margin-bottom:6px; }
-    .form-group input, .form-group select, .form-group textarea {
-      width:100%; background:var(--surface); border:1px solid var(--border);
-      color:var(--text); padding:10px 14px; border-radius:8px; font-size:0.9rem; outline:none;
-      transition:border-color .2s; font-family:'Inter',sans-serif;
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--accent); }
-    .form-group textarea { resize:vertical; min-height:80px; }
-    .btn {
-      padding:10px 20px; border-radius:8px; cursor:pointer;
-      font-weight:600; font-size:0.88rem; border:none; transition:all .2s;
-    }
-    .btn-primary { background:var(--accent); color:#fff; }
-    .btn-primary:hover { background:var(--accent2); }
-    .btn-danger  { background:var(--danger); color:#fff; }
-    .btn-ghost   { background:var(--surface); border:1px solid var(--border); color:var(--muted); }
-    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
-    .btn-sm { padding:6px 12px; font-size:0.78rem; }
-    .btn-full { width:100%; }
-    .err-msg { font-size:0.8rem; color:var(--danger); margin-top:8px; min-height:18px; }
-
-    /* ── LAYOUT ── */
-    #app { display:none; min-height:100vh; }
-    .sidebar {
-      position:fixed; left:0; top:0; bottom:0; width:220px;
-      background:var(--surface); border-right:1px solid var(--border);
-      padding:20px 0; z-index:10;
-      display:flex; flex-direction:column;
-    }
-    .sidebar-logo {
-      font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem;
-      color:var(--accent); padding:0 20px 20px;
-      border-bottom:1px solid var(--border); margin-bottom:12px;
-    }
-    .nav-item {
-      display:flex; align-items:center; gap:10px;
-      padding:10px 20px; cursor:pointer; color:var(--muted);
-      font-size:0.88rem; transition:all .2s; border-left:3px solid transparent;
-    }
-    .nav-item:hover { color:var(--text); background:rgba(45,156,255,0.05); }
-    .nav-item.active { color:var(--accent); border-left-color:var(--accent); background:rgba(45,156,255,0.08); }
-    .sidebar-bottom { margin-top:auto; padding:16px 20px; }
-    .admin-badge {
-      background:rgba(45,156,255,0.1); border:1px solid rgba(45,156,255,0.2);
-      border-radius:8px; padding:10px; font-size:0.78rem;
-    }
-    .admin-badge .name { font-weight:600; color:var(--text); }
-    .admin-badge .role { color:var(--muted); font-size:0.72rem; }
-    .logout-btn { margin-top:8px; width:100%; }
-
-    .main { margin-left:220px; padding:28px; }
-    .page { display:none; }
-    .page.active { display:block; }
-
-    /* ── HEADER ── */
-    .page-header { margin-bottom:28px; }
-    .page-header h1 { font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; }
-    .page-header p { color:var(--muted); font-size:0.85rem; margin-top:4px; }
-
-    /* ── STATS CARDS ── */
-    .stats-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; margin-bottom:28px; }
-    .stat-card {
-      background:var(--card); border:1px solid var(--border);
-      border-radius:12px; padding:18px;
-    }
-    .stat-card .label { font-size:0.75rem; color:var(--muted); margin-bottom:6px; }
-    .stat-card .value { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; }
-    .stat-card .sub { font-size:0.75rem; color:var(--muted); margin-top:2px; }
-
-    /* ── TABLE ── */
-    .table-wrap { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
-    .table-header {
-      padding:16px 20px; border-bottom:1px solid var(--border);
-      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
-    }
-    .table-header h3 { font-family:'Syne',sans-serif; font-weight:700; }
-    table { width:100%; border-collapse:collapse; }
-    th { text-align:left; font-size:0.75rem; color:var(--muted); padding:12px 16px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; border-bottom:1px solid var(--border); }
-    td { padding:12px 16px; font-size:0.85rem; border-bottom:1px solid rgba(26,58,92,0.5); vertical-align:middle; }
-    tr:last-child td { border-bottom:none; }
-    tr:hover td { background:rgba(45,156,255,0.03); }
-    .td-actions { display:flex; gap:6px; }
-
-    /* ── BADGE ── */
-    .badge { display:inline-flex; align-items:center; font-size:0.7rem; font-weight:700; padding:3px 8px; border-radius:4px; }
-    .badge-green { background:rgba(34,211,165,0.15); color:var(--success); }
-    .badge-red   { background:rgba(244,63,94,0.15); color:var(--danger); }
-    .badge-blue  { background:rgba(45,156,255,0.15); color:var(--accent); }
-    .badge-warn  { background:rgba(245,158,11,0.15); color:var(--warn); }
-
-    /* ── MODAL/DRAWER ── */
-    .drawer-overlay {
-      position:fixed; inset:0; z-index:200;
-      background:rgba(7,17,31,0.7); backdrop-filter:blur(6px);
-      opacity:0; pointer-events:none; transition:opacity .2s;
-    }
-    .drawer-overlay.open { opacity:1; pointer-events:all; }
-    .drawer {
-      position:fixed; right:0; top:0; bottom:0; width:100%; max-width:460px;
-      background:var(--card); border-left:1px solid var(--border);
-      overflow-y:auto; z-index:201;
-      transform:translateX(100%); transition:transform .25s;
-      padding:24px;
-    }
-    .drawer-overlay.open .drawer { transform:translateX(0); }
-    .drawer-header {
-      display:flex; align-items:center; justify-content:space-between;
-      margin-bottom:24px;
-    }
-    .drawer-title { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800; }
-    .drawer-close { background:var(--surface); border:1px solid var(--border); color:var(--muted); width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:1rem; }
-
-    /* ── TOAST ── */
-    #toast { position:fixed; bottom:20px; right:20px; z-index:999; background:var(--card); border:1px solid var(--border); color:var(--text); padding:12px 16px; border-radius:10px; font-size:0.85rem; transform:translateY(20px); opacity:0; transition:all .3s; max-width:260px; }
-    #toast.show { transform:translateY(0); opacity:1; }
-    #toast.success { border-color:var(--success); color:var(--success); }
-    #toast.error   { border-color:var(--danger); color:var(--danger); }
-
-    /* ── TOGGLE ── */
-    .toggle { position:relative; display:inline-block; width:40px; height:22px; }
-    .toggle input { opacity:0; width:0; height:0; }
-    .slider { position:absolute; inset:0; background:var(--border); border-radius:22px; cursor:pointer; transition:.3s; }
-    .slider:before { content:''; position:absolute; width:16px; height:16px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.3s; }
-    input:checked + .slider { background:var(--accent); }
-    input:checked + .slider:before { transform:translateX(18px); }
-
-    .search-mini { display:flex; gap:8px; }
-    .search-mini input { background:var(--surface); border:1px solid var(--border); color:var(--text); padding:8px 12px; border-radius:8px; font-size:0.82rem; outline:none; width:200px; }
-    .search-mini input:focus { border-color:var(--accent); }
-
-    @media(max-width:768px){
-      .sidebar { width:60px; }
-      .sidebar .sidebar-logo, .sidebar .nav-item span, .sidebar .admin-badge, .sidebar .logout-btn span { display:none; }
-      .nav-item { justify-content:center; }
-      .main { margin-left:60px; padding:16px; }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin RobloxStore</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#07111f;color:#e8f4ff;font-family:sans-serif;padding:16px;}
+h1{color:#2d9cff;font-size:1.3rem;margin-bottom:20px;}
+h2{font-size:1rem;margin-bottom:12px;color:#5bb8ff;}
+.card{background:#112540;border:1px solid #1a3a5c;border-radius:12px;padding:16px;margin-bottom:16px;}
+input,select,textarea{width:100%;background:#07111f;border:1px solid #1a3a5c;color:#e8f4ff;padding:10px;border-radius:8px;font-size:0.9rem;margin-bottom:10px;outline:none;}
+button{width:100%;padding:12px;background:#2d9cff;color:#fff;border:none;border-radius:8px;font-size:0.95rem;font-weight:700;cursor:pointer;margin-bottom:8px;}
+button.red{background:#f43f5e;}
+button.gray{background:#1a3a5c;}
+#msg{padding:10px;border-radius:8px;margin-bottom:12px;display:none;font-size:0.85rem;}
+#msg.ok{background:rgba(34,211,165,0.2);color:#22d3a5;display:block;}
+#msg.err{background:rgba(244,63,94,0.2);color:#f43f5e;display:block;}
+.prod-item{background:#07111f;border:1px solid #1a3a5c;border-radius:8px;padding:12px;margin-bottom:8px;}
+.prod-name{font-weight:700;margin-bottom:4px;}
+.prod-info{font-size:0.8rem;color:#7aaac7;margin-bottom:8px;}
+.row{display:flex;gap:8px;}
+.row button{margin:0;}
+</style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">🎮 RobloxStore</div>
-    <h2>Masuk ke Panel Admin</h2>
-    <div class="form-group">
-      <label>Username</label>
-      <input type="text" id="login-user" placeholder="admin" />
-    </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
-    </div>
-    <div class="err-msg" id="login-err"></div>
-    <button class="btn btn-primary btn-full" style="margin-top:12px" onclick="doLogin()">Masuk</button>
-  </div>
+<h1>🎮 Admin RobloxStore</h1>
+<div id="msg"></div>
+
+<!-- TAMBAH PRODUK -->
+<div class="card">
+  <h2>➕ Tambah Produk</h2>
+  <input type="text" id="p-name" placeholder="Nama produk *" />
+  <select id="p-cat">
+    <option value="starter">Starter</option>
+    <option value="mid">Mid-Range</option>
+    <option value="premium">Premium</option>
+    <option value="rare">Rare Items</option>
+  </select>
+  <input type="number" id="p-price" placeholder="Harga (Rp) *" />
+  <input type="number" id="p-stock" placeholder="Stok *" />
+  <input type="text" id="p-desc" placeholder="Deskripsi singkat" />
+  <input type="text" id="p-img" placeholder="URL gambar (opsional)" />
+  <button onclick="tambahProduk()">Simpan Produk</button>
 </div>
 
-<!-- APP -->
-<div id="app">
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-logo">🎮 <span>Admin</span></div>
-    <div class="nav-item active" onclick="showPage('dashboard')">📊 <span>Dashboard</span></div>
-    <div class="nav-item" onclick="showPage('products')">🛍️ <span>Produk</span></div>
-    <div class="nav-item" onclick="showPage('promos')">🎁 <span>Promo</span></div>
-    <div class="nav-item" onclick="showPage('orders')">📦 <span>Pesanan</span></div>
-    <div class="sidebar-bottom">
-      <div class="admin-badge">
-        <div class="name" id="admin-name">Admin</div>
-        <div class="role">Administrator</div>
-      </div>
-      <button class="btn btn-ghost btn-full logout-btn" style="margin-top:8px" onclick="doLogout()">🚪 <span>Keluar</span></button>
-    </div>
-  </div>
-
-  <!-- MAIN -->
-  <div class="main">
-
-    <!-- DASHBOARD -->
-    <div class="page active" id="page-dashboard">
-      <div class="page-header">
-        <h1>Dashboard</h1>
-        <p>Selamat datang kembali! Berikut ringkasan toko kamu.</p>
-      </div>
-      <div class="stats-row">
-        <div class="stat-card"><div class="label">Total Produk</div><div class="value" id="dash-total">—</div><div class="sub">produk terdaftar</div></div>
-        <div class="stat-card"><div class="label">Tersedia</div><div class="value" id="dash-avail" style="color:var(--success)">—</div><div class="sub">stok > 0</div></div>
-        <div class="stat-card"><div class="label">Habis</div><div class="value" id="dash-empty" style="color:var(--danger)">—</div><div class="sub">perlu restock</div></div>
-        <div class="stat-card"><div class="label">Promo Aktif</div><div class="value" id="dash-promo" style="color:var(--warn)">—</div><div class="sub">kode aktif</div></div>
-      </div>
-      <div class="table-wrap">
-        <div class="table-header"><h3>Produk Stok Rendah</h3></div>
-        <table>
-          <thead><tr><th>Produk</th><th>Stok</th><th>Harga</th><th>Status</th></tr></thead>
-          <tbody id="low-stock-table"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Memuat...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- PRODUCTS -->
-    <div class="page" id="page-products">
-      <div class="page-header">
-        <h1>Manajemen Produk</h1>
-        <p>Tambah, edit, dan hapus produk toko.</p>
-      </div>
-      <div class="table-wrap">
-        <div class="table-header">
-          <h3>Semua Produk</h3>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <div class="search-mini"><input type="text" placeholder="Cari produk..." id="prod-search" oninput="filterTable()" /></div>
-            <button class="btn btn-primary btn-sm" onclick="openProductDrawer(null)">+ Tambah Produk</button>
-          </div>
-        </div>
-        <div style="overflow-x:auto">
-        <table>
-          <thead>
-            <tr>
-              <th>Produk</th>
-              <th>Kategori</th>
-              <th>Harga</th>
-              <th>Stok</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="products-table"></tbody>
-        </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- PROMOS -->
-    <div class="page" id="page-promos">
-      <div class="page-header">
-        <h1>Kode Promo</h1>
-        <p>Kelola diskon dan kode promo.</p>
-      </div>
-      <div class="table-wrap">
-        <div class="table-header">
-          <h3>Semua Promo</h3>
-          <button class="btn btn-primary btn-sm" onclick="openPromoDrawer(null)">+ Tambah Promo</button>
-        </div>
-        <div style="overflow-x:auto">
-        <table>
-          <thead>
-            <tr><th>Kode</th><th>Tipe</th><th>Nilai</th><th>Deskripsi</th><th>Status</th><th>Aksi</th></tr>
-          </thead>
-          <tbody id="promos-table"></tbody>
-        </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ORDERS -->
-    <div class="page" id="page-orders">
-      <div class="page-header">
-        <h1>Pesanan</h1>
-        <p>Fitur ini akan tersedia segera.</p>
-      </div>
-      <div class="table-wrap">
-        <div style="text-align:center;padding:60px;color:var(--muted)">
-          <div style="font-size:3rem;margin-bottom:12px">📦</div>
-          <p>Fitur manajemen pesanan segera hadir.</p>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /main -->
-</div><!-- /app -->
-
-<!-- PRODUCT DRAWER -->
-<div class="drawer-overlay" id="prod-drawer-overlay" onclick="closeDrawer(event,'prod')">
-  <div class="drawer">
-    <div class="drawer-header">
-      <span class="drawer-title" id="prod-drawer-title">Tambah Produk</span>
-      <button class="drawer-close" onclick="closeProdDrawer()">✕</button>
-    </div>
-    <input type="hidden" id="prod-id" />
-    <div class="form-group"><label>Nama Produk *</label><input id="prod-name" placeholder="Contoh: Akun Roblox Premium 500 Robux" /></div>
-    <div class="form-group"><label>Kategori</label>
-      <select id="prod-cat">
-        <option value="starter">Starter</option>
-        <option value="mid">Mid-Range</option>
-        <option value="premium">Premium</option>
-        <option value="rare">Rare Items</option>
-      </select>
-    </div>
-    <div class="form-group"><label>Harga (Rp) *</label><input id="prod-price" type="number" placeholder="50000" /></div>
-    <div class="form-group"><label>Harga Asli (opsional)</label><input id="prod-orig" type="number" placeholder="75000" /></div>
-    <div class="form-group"><label>Stok *</label><input id="prod-stock" type="number" placeholder="10" /></div>
-    <div class="form-group"><label>Deskripsi Singkat</label><input id="prod-short" placeholder="Maks 60 karakter" /></div>
-    <div class="form-group"><label>Deskripsi Lengkap</label><textarea id="prod-desc" rows="3" placeholder="Detail lengkap produk..."></textarea></div>
-    <div class="form-group"><label>URL Gambar (opsional)</label><input id="prod-img" placeholder="https://..." /></div>
-    <div class="form-group"><label>Garansi</label><input id="prod-warranty" placeholder="7 hari" /></div>
-    <div class="form-group" style="display:flex;align-items:center;gap:10px">
-      <label style="margin:0">Produk Baru</label>
-      <label class="toggle"><input type="checkbox" id="prod-new" /><span class="slider"></span></label>
-    </div>
-    <div class="err-msg" id="prod-err"></div>
-    <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="btn btn-primary" onclick="saveProduct()" style="flex:1">Simpan</button>
-      <button class="btn btn-ghost" onclick="closeProdDrawer()">Batal</button>
-    </div>
-  </div>
+<!-- DAFTAR PRODUK -->
+<div class="card">
+  <h2>📦 Daftar Produk</h2>
+  <button class="gray" onclick="loadProduk()">🔄 Refresh</button>
+  <div id="prod-list">Memuat...</div>
 </div>
 
-<!-- PROMO DRAWER -->
-<div class="drawer-overlay" id="promo-drawer-overlay" onclick="closeDrawer(event,'promo')">
-  <div class="drawer">
-    <div class="drawer-header">
-      <span class="drawer-title" id="promo-drawer-title">Tambah Promo</span>
-      <button class="drawer-close" onclick="closePromoDrawer()">✕</button>
-    </div>
-    <input type="hidden" id="promo-id" />
-    <div class="form-group"><label>Kode Promo *</label><input id="promo-code" placeholder="Contoh: HEMAT10" style="text-transform:uppercase" /></div>
-    <div class="form-group"><label>Tipe Diskon</label>
-      <select id="promo-type">
-        <option value="percent">Persen (%)</option>
-        <option value="fixed">Nominal (Rp)</option>
-      </select>
-    </div>
-    <div class="form-group"><label>Nilai Diskon *</label><input id="promo-value" type="number" placeholder="10" /></div>
-    <div class="form-group"><label>Deskripsi</label><input id="promo-desc" placeholder="Contoh: Diskon 10% untuk semua produk" /></div>
-    <div class="form-group" style="display:flex;align-items:center;gap:10px">
-      <label style="margin:0">Aktif</label>
-      <label class="toggle"><input type="checkbox" id="promo-active" checked /><span class="slider"></span></label>
-    </div>
-    <div class="err-msg" id="promo-err"></div>
-    <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="btn btn-primary" onclick="savePromo()" style="flex:1">Simpan</button>
-      <button class="btn btn-ghost" onclick="closePromoDrawer()">Batal</button>
-    </div>
-  </div>
+<!-- TAMBAH PROMO -->
+<div class="card">
+  <h2>🎁 Tambah Promo</h2>
+  <input type="text" id="pr-code" placeholder="Kode promo (contoh: HEMAT10)" style="text-transform:uppercase"/>
+  <select id="pr-type">
+    <option value="percent">Persen (%)</option>
+    <option value="fixed">Nominal (Rp)</option>
+  </select>
+  <input type="number" id="pr-val" placeholder="Nilai diskon" />
+  <input type="text" id="pr-desc" placeholder="Deskripsi promo" />
+  <button onclick="tambahPromo()">Simpan Promo</button>
 </div>
 
-<div id="toast"></div>
+<!-- DAFTAR PROMO -->
+<div class="card">
+  <h2>🏷️ Daftar Promo</h2>
+  <button class="gray" onclick="loadPromo()">🔄 Refresh</button>
+  <div id="promo-list">Memuat...</div>
+</div>
 
 <script>
-  const API = '';
-  let token = localStorage.getItem('admin_token') || '';
-  let products = [], promos = [];
+function msg(text, type) {
+  var el = document.getElementById('msg');
+  el.textContent = text;
+  el.className = type;
+  setTimeout(function(){ el.style.display='none'; el.className=''; }, 3000);
+}
 
-  // ── AUTH ──
-  async function doLogin() {
-    const u = document.getElementById('login-user').value.trim();
-    const p = document.getElementById('login-pass').value;
-    const err = document.getElementById('login-err');
-    if (!u || !p) { err.textContent = 'Isi username dan password.'; return; }
-    try {
-      const res = await fetch(`${API}/api/admin/login`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ username: u, password: p })
-      });
-      const data = await res.json();
-      if (data.token) {
-        token = data.token;
-        localStorage.setItem('admin_token', token);
-        document.getElementById('admin-name').textContent = u;
-        showApp();
-      } else {
-        err.textContent = data.message || 'Login gagal.';
-      }
-    } catch(e) {
-      err.textContent = 'Tidak bisa terhubung ke server.';
+function fmt(n) { return 'Rp ' + Number(n).toLocaleString('id-ID'); }
+
+async function tambahProduk() {
+  var name = document.getElementById('p-name').value.trim();
+  var price = document.getElementById('p-price').value;
+  var stock = document.getElementById('p-stock').value;
+  if (!name || !price || !stock) { msg('Nama, harga, dan stok wajib diisi!', 'err'); return; }
+  try {
+    var res = await fetch('/api/products', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        name: name,
+        category: document.getElementById('p-cat').value,
+        price: Number(price),
+        stock: Number(stock),
+        short_desc: document.getElementById('p-desc').value,
+        description: document.getElementById('p-desc').value,
+        image_url: document.getElementById('p-img').value
+      })
+    });
+    var data = await res.json();
+    if (res.ok) {
+      msg('Produk berhasil ditambahkan!', 'ok');
+      document.getElementById('p-name').value = '';
+      document.getElementById('p-price').value = '';
+      document.getElementById('p-stock').value = '';
+      document.getElementById('p-desc').value = '';
+      document.getElementById('p-img').value = '';
+      loadProduk();
+    } else {
+      msg('Error: ' + (data.message || 'Gagal'), 'err');
     }
+  } catch(e) {
+    msg('Error: ' + e.message, 'err');
   }
+}
 
-  function doLogout() {
-    localStorage.removeItem('admin_token');
-    token = '';
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'flex';
+async function loadProduk() {
+  document.getElementById('prod-list').innerHTML = 'Memuat...';
+  try {
+    var res = await fetch('/api/products');
+    var data = await res.json();
+    if (!data.length) { document.getElementById('prod-list').innerHTML = '<p style="color:#7aaac7;font-size:0.85rem">Belum ada produk</p>'; return; }
+    document.getElementById('prod-list').innerHTML = data.map(function(p) {
+      return '<div class="prod-item">' +
+        '<div class="prod-name">' + p.name + '</div>' +
+        '<div class="prod-info">' + fmt(p.price) + ' · Stok: ' + p.stock + ' · ' + (p.category||'-') + '</div>' +
+        '<div class="row">' +
+        '<button class="gray" onclick="editStok(' + p.id + ',' + p.stock + ')">✏️ Edit Stok</button>' +
+        '<button class="red" onclick="hapusProduk(' + p.id + ')">🗑️ Hapus</button>' +
+        '</div></div>';
+    }).join('');
+  } catch(e) {
+    document.getElementById('prod-list').innerHTML = '<p style="color:#f43f5e">Gagal memuat</p>';
   }
+}
 
-  function showApp() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    loadDashboard();
-    loadProducts();
-    loadPromos();
+async function hapusProduk(id) {
+  if (!confirm('Hapus produk ini?')) return;
+  await fetch('/api/products/' + id, {method: 'DELETE'});
+  msg('Produk dihapus!', 'ok');
+  loadProduk();
+}
+
+async function editStok(id, stok) {
+  var baru = prompt('Stok baru (sekarang: ' + stok + '):', stok);
+  if (baru === null) return;
+  await fetch('/api/products/' + id, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({stock: Number(baru)})
+  });
+  msg('Stok diupdate!', 'ok');
+  loadProduk();
+}
+
+async function tambahPromo() {
+  var code = document.getElementById('pr-code').value.trim().toUpperCase();
+  var val = document.getElementById('pr-val').value;
+  if (!code || !val) { msg('Kode dan nilai wajib diisi!', 'err'); return; }
+  try {
+    var res = await fetch('/api/promos', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        code: code,
+        type: document.getElementById('pr-type').value,
+        value: Number(val),
+        description: document.getElementById('pr-desc').value,
+        is_active: true
+      })
+    });
+    var data = await res.json();
+    if (res.ok) {
+      msg('Promo berhasil ditambahkan!', 'ok');
+      document.getElementById('pr-code').value = '';
+      document.getElementById('pr-val').value = '';
+      document.getElementById('pr-desc').value = '';
+      loadPromo();
+    } else {
+      msg('Error: ' + (data.message || 'Gagal'), 'err');
+    }
+  } catch(e) {
+    msg('Error: ' + e.message, 'err');
   }
+}
 
-  // Auto-login if token exists
-  if (token) {
-    document.getElementById('admin-name').textContent = 'Admin';
-    showApp();
+async function loadPromo() {
+  document.getElementById('promo-list').innerHTML = 'Memuat...';
+  try {
+    var res = await fetch('/api/promos');
+    var data = await res.json();
+    if (!data.length) { document.getElementById('promo-list').innerHTML = '<p style="color:#7aaac7;font-size:0.85rem">Belum ada promo</p>'; return; }
+    document.getElementById('promo-list').innerHTML = data.map(function(p) {
+      return '<div class="prod-item">' +
+        '<div class="prod-name">' + p.code + '</div>' +
+        '<div class="prod-info">' + (p.type==='percent' ? p.value+'%' : fmt(p.value)) + ' · ' + (p.is_active ? '✅ Aktif' : '❌ Nonaktif') + '</div>' +
+        '<button class="red" onclick="hapusPromo(' + p.id + ')">🗑️ Hapus</button>' +
+        '</div>';
+    }).join('');
+  } catch(e) {
+    document.getElementById('promo-list').innerHTML = '<p style="color:#f43f5e">Gagal memuat</p>';
   }
+}
 
-  const headers = () => ({ 'Content-Type':'application/json', 'Authorization':'Bearer '+token });
+async function hapusPromo(id) {
+  if (!confirm('Hapus promo ini?')) return;
+  await fetch('/api/promos/' + id, {method: 'DELETE'});
+  msg('Promo dihapus!', 'ok');
+  loadPromo();
+}
 
-  // ── NAV ──
-  function showPage(name) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('page-'+name).classList.add('active');
-    event.currentTarget.classList.add('active');
-  }
-
-  // ── DASHBOARD ──
-  async function loadDashboard() {
-    try {
-      const res = await fetch(`${API}/api/products`);
-      const data = await res.json();
-      products = data;
-      document.getElementById('dash-total').textContent = data.length;
-      document.getElementById('dash-avail').textContent = data.filter(p => p.stock > 0).length;
-      document.getElementById('dash-empty').textContent = data.filter(p => p.stock <= 
+loadProduk();
+loadPromo();
+</script>
+</body>
+</html>
